@@ -21,15 +21,15 @@ def create_note(request):
 
     content = request.headers["content"]
     note = Note.objects.create(content=content)
-    url = str(note.identifier) + get_random_string(8)
-    note.url = url
+    url_key = str(note.key) + get_random_string(8)
+    note.url_key = url_key
     note.save()
-    return HttpResponse(make_secure_url(note.url))
+    return HttpResponse(make_secure_url(note.url_key))
 
 
-def show_note(request, url):
+def show_note(request, url_key):
     try:
-        note = Note.objects.get(url=url)
+        note = Note.objects.get(url_key=url_key)
     except Note.DoesNotExist:
         return HttpResponse(err_message_404)
 

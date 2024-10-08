@@ -5,8 +5,8 @@ from django.db import models
 
 
 class Note(models.Model):
-    identifier = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    url = models.CharField(max_length=500)
+    key = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    url_key = models.CharField(max_length=500)
     content = models.TextField()
     is_read = models.BooleanField(default=False)
     start_date = models.DateTimeField(auto_now=True)    
