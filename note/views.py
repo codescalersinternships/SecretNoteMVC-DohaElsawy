@@ -11,9 +11,9 @@ from dotenv import load_dotenv
 
 show_url = "http://127.0.0.1:8000/note/show/"
 err_wrong_http_method = "error, the http mothed is not post"
-err_message_readed = "the message has been readed"
+err_message_readed_or_404 = "the message has been readed or not exist"
 err_message_expired = "message has expired"
-err_message_404 = "message not found"
+
 
 
 def create_note(request):
@@ -37,20 +37,21 @@ def create_note(request):
 def show_note(request, url_key):
     try:
         note = Note.objects.get(url_key=url_key)
-    except Note.DoesNotExist:
-        return HttpResponse(err_message_404)
+        if is_expiry_date(note.start_date):
+            return HttpResponse(err_message_expired)
+        
+        decrypted_content = decrypt_contnet(note.content)
 
-    if note.is_read == True:
-        return HttpResponse(err_message_readed)
+        Note.objects.filter(url_key=url_key).delete()
+        return HttpResponse(decrypted_content)
     
-    if is_expiry_date(note.start_date):
-        return HttpResponse(err_message_expired)
+    except Note.DoesNotExist:
+        return HttpResponse(err_message_readed_or_404)
+
     
-    note.is_read = True
-    note.save()
+
     
-    decrypted_content = decrypt_contnet(note.content)
-    return HttpResponse(decrypted_content)
+    
 
 
 def make_secure_url(note_url):
