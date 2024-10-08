@@ -1,9 +1,11 @@
+import os
 from django.utils import timezone
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.crypto import get_random_string
 from .models import Note
-
+import cryptocode
+from dotenv import load_dotenv
 # Create your views here.
 
 
@@ -20,10 +22,15 @@ def create_note(request):
         return HttpResponse(err_wrong_http_method)
 
     content = request.headers["content"]
-    note = Note.objects.create(content=content)
+
+    encrypted_content = encrypt_content(content)
+    
+    note = Note.objects.create(content=encrypted_content)
+    
     url_key = str(note.key) + get_random_string(8)
     note.url_key = url_key
     note.save()
+    
     return HttpResponse(make_secure_url(note.url_key))
 
 
@@ -41,7 +48,9 @@ def show_note(request, url_key):
     
     note.is_read = True
     note.save()
-    return HttpResponse(note.content)
+    
+    decrypted_content = decrypt_contnet(note.content)
+    return HttpResponse(decrypted_content)
 
 
 def make_secure_url(note_url):
@@ -56,3 +65,15 @@ def is_expiry_date(date):
         return True
 
     return False
+
+
+def encrypt_content(content):
+    SECRET_KEY = os.environ.get("ENCRYPTKEY")
+    encrypted_content = cryptocode.encrypt(content, SECRET_KEY)
+    return encrypted_content
+
+
+def decrypt_contnet(encrypted_content):
+    SECRET_KEY = os.environ.get("ENCRYPTKEY")
+    content = cryptocode.decrypt(encrypted_content, SECRET_KEY)
+    return content
