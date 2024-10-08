@@ -21,7 +21,7 @@ err_message_expired = "message has expired"
 def create_note(request):
 
     if request.method != "POST":
-        return HttpResponse(err_wrong_http_method)
+        return HttpResponse(err_wrong_http_method,status=405)
 
     content = request.headers["content"]
 
@@ -33,7 +33,7 @@ def create_note(request):
     note.url_key = url_key
     note.save()
 
-    return HttpResponse(make_secure_url(note.url_key))
+    return HttpResponse(make_secure_url(note.url_key),status=200)
 
 
 def show_note(request, url_key):
@@ -51,7 +51,7 @@ def show_note(request, url_key):
         #     )
 
         if is_expiry_date(note.start_date):
-            return HttpResponse(err_message_expired)
+            return HttpResponse(err_message_expired,status=410)
 
         decrypted_content = decrypt_contnet(note.content)
 
@@ -59,7 +59,7 @@ def show_note(request, url_key):
         return HttpResponse(decrypted_content)
 
     except Note.DoesNotExist:
-        return HttpResponse(err_message_readed_or_404)
+        return HttpResponse(err_message_readed_or_404,status=404)
 
 
 def make_secure_url(note_url):
