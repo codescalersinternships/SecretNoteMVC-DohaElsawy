@@ -1,4 +1,5 @@
 import os
+from django.shortcuts import render
 from django.utils import timezone
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
@@ -20,25 +21,28 @@ RATE_LIMIT = 5
 PERIOD = 60
 
 
-def create_note(request):
+def create_note(response):
 
-    if request.method != "POST":
-        return HttpResponse(err_wrong_http_method, status=405)
+    if response.POST.get("save"):
+        content = response.POST.get("note")
 
-    content = request.headers["content"]
+        encrypted_content = encrypt_content(content)
 
-    encrypted_content = encrypt_content(content)
+        note = Note.objects.create(content=encrypted_content)
 
-    note = Note.objects.create(content=encrypted_content)
+        url_key = str(note.key) + get_random_string(8)
+        note.url_key = url_key
+        note.save()
 
-    url_key = str(note.key) + get_random_string(8)
-    note.url_key = url_key
-    note.save()
+        if response.method != 'POST':
+            return render(response, "note/error.html",{"error":f"{err_wrong_http_method}"},status=405)
+        
+        return render(response, "note/url_result.html",{"url":f"{make_secure_url(note.url_key)}"})
 
-    return HttpResponse(make_secure_url(note.url_key), status=200)
+    return render(response, "note/create_note.html")
 
 
-def show_note(request, url_key):
+def show_note(response, url_key):
     try:
 
         try:
@@ -48,23 +52,25 @@ def show_note(request, url_key):
                 period=PERIOD,
             ).check()
         except RateLimitExceeded as e:
-            return HttpResponse(
-                err_block_request,
-                status=429,
-            )
+            return render(response, "note/error.html",{"error":f"{err_block_request}"},status=429)
 
         note = Note.objects.get(url_key=url_key)
 
         if is_expiry_date(note.start_date):
-            return HttpResponse(err_message_expired, status=410)
+            return render(response, "note/error.html",{"error":f"{err_block_request}"},status=410)
 
         decrypted_content = decrypt_contnet(note.content)
 
         Note.objects.filter(url_key=url_key).delete()
-        return HttpResponse(decrypted_content, status=200)
+        return render(response, "note/show_note.html",{"note":f"{decrypted_content}"},status=200)
 
     except Note.DoesNotExist:
-        return HttpResponse(err_message_readed_or_404, status=404)
+        return render(response, "note/error.html",{"error":f"{err_message_readed_or_404}"},status=404)
+
+    
+
+def home(request):
+    return render(request,'note/home.html')
 
 
 def make_secure_url(note_url):

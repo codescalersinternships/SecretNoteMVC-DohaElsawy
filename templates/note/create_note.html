@@ -1,0 +1,12 @@
+{% extends 'note/base.html' %}
+
+
+{% block content %}
+<h2>write your secret note</h2>
+<form method="post" action="create_note">
+    {% csrf_token %}
+    <textarea name="note" id="note"></textarea>
+    <button type="submit" , name="save" , value="save">Save</button>
+</form>
+
+{% endblock %}

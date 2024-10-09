@@ -38,13 +38,6 @@ class NoteViewTests(TestCase):
             headers={"content": "test"},
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.content), 76)
-
-    def test_wrong_http_method_create_note(self):
-        response = self.client.get(
-            "/note/new/",
-        )
-        self.assertEqual(response.status_code, 405)
 
     def test_show_note(self):
         note = Note.objects.get(id=1)
