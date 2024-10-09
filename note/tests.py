@@ -1,12 +1,18 @@
 import datetime
 from django.test import TestCase
+
+from note.views import RATE_LIMIT
 from .models import Note
 import datetime
+from django.core.cache import cache
 
 # Create your tests here.
 
 
 class NoteViewTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
     @classmethod
     def setUpTestData(cls):
 
@@ -60,6 +66,24 @@ class NoteViewTests(TestCase):
             f"/note/show/{note.url_key}",
         )
         self.assertEqual(response.status_code, 410)
+
+    def test_rate_limit_show_note(self):
+        notes = []
+        for i in range(9):
+            notes.append(
+                Note.objects.create(
+                    content="test",
+                    url_key=f"{i}4799473-782b-4ae7-b091-acbae81f7baepdx9wo3T",
+                    key=f"{i}4799473-782b-4ae7-b091-acbae81f7bae",
+                )
+            )
+        for i in range(len(notes)):
+            response = self.client.get(
+                f"/note/show/{notes[i].url_key}",
+            )
+            if i > RATE_LIMIT:
+                self.assertEqual(response.status_code, 429)
+                break
 
 
 class AuthorModelTest(TestCase):
