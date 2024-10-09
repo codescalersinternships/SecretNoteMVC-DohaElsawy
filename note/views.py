@@ -40,23 +40,13 @@ def show_note(request, url_key):
     try:
         note = Note.objects.get(url_key=url_key)
 
-        # try:
-        #     RateLimit(
-        #         key=f"{url_key}:panel:{note.url_key}", limit=1,period=120,
-        #     ).check()
-
-        # except RateLimitExceeded as e:
-        #     return HttpResponse(f"Rate limit exceeded. You have used {e.usage} requests, limit is {e.limit}.",
-        #         status=429,
-        #     )
-
         if is_expiry_date(note.start_date):
             return HttpResponse(err_message_expired,status=410)
 
         decrypted_content = decrypt_contnet(note.content)
 
         Note.objects.filter(url_key=url_key).delete()
-        return HttpResponse(decrypted_content)
+        return HttpResponse(decrypted_content,status=200)
 
     except Note.DoesNotExist:
         return HttpResponse(err_message_readed_or_404,status=404)
