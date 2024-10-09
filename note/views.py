@@ -3,11 +3,13 @@ from django.utils import timezone
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.crypto import get_random_string
+from django_ratelimit import exceptions
 
-from note.ratelimit import RateLimit, RateLimitExceeded
 from .models import Note
 import cryptocode
 from dotenv import load_dotenv
+
+from django_ratelimit.decorators import ratelimit
 
 # Create your views here.
 
@@ -16,6 +18,7 @@ show_url = "http://127.0.0.1:8000/note/show/"
 err_wrong_http_method = "error, the http mothed is not post"
 err_message_readed_or_404 = "the message has been readed or not exist"
 err_message_expired = "message has expired"
+err_block_request = "you reach request's limit, please wait 5 mins"
 
 
 def create_note(request):
@@ -35,17 +38,15 @@ def create_note(request):
 
     return HttpResponse(make_secure_url(note.url_key), status=200)
 
-
+@ratelimit(key='ip', rate='5/m',block=False)
 def show_note(request, url_key):
     try:
-        note = Note.objects.get(url_key=url_key)
+
+        was_limited = getattr(request, 'limited', False)
+        if was_limited:
+            return HttpResponse(err_block_request, status=429)
         
-        RateLimit(
-            key=f"{note.id}:panel:{note.id}",
-            limit=1,
-            period=60,
-        ).check()
-        # print(request)
+        note = Note.objects.get(url_key=url_key)
 
         if is_expiry_date(note.start_date):
             return HttpResponse(err_message_expired, status=410)
@@ -83,3 +84,4 @@ def decrypt_contnet(encrypted_content):
     SECRET_KEY = os.environ.get("ENCRYPTKEY")
     content = cryptocode.decrypt(encrypted_content, SECRET_KEY)
     return content
+
