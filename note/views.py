@@ -18,18 +18,31 @@ err_message_readed_or_404 = "the message has been readed or not exist"
 err_message_expired = "message has expired"
 err_block_request = "you reach request's limit, please wait 1 min"
 err_empty_content = "you can't send empty note"
+err_login_first = "you have to login first"
 
 RATE_LIMIT = 5
 PERIOD = 60
 
 
 def create_note(response):
+    if not response.user.is_authenticated:
+        return render(
+            response,
+            "note/content.html",
+            {"response": f"{err_login_first}"},
+            status=401,
+        )
 
     if response.POST.get("save"):
         content = response.POST.get("note")
 
-        if content is None :
-            return render(response, "note/content.html",{"response":f"{err_empty_content}"},status=500)
+        if not content:
+            return render(
+                response,
+                "note/content.html",
+                {"response": f"{err_empty_content}"},
+                status=500,
+            )
 
         encrypted_content = encrypt_content(content)
 
@@ -39,10 +52,17 @@ def create_note(response):
         note.url_key = url_key
         note.save()
 
-        if response.method != 'POST':
-            return render(response, "note/content.html",{"response":f"{err_wrong_http_method}"},status=405)
-        
-        return render(response, "note/content.html",{"url":f"{make_secure_url(note.url_key)}"})
+        if response.method != "POST":
+            return render(
+                response,
+                "note/content.html",
+                {"response": f"{err_wrong_http_method}"},
+                status=405,
+            )
+
+        return render(
+            response, "note/content.html", {"url": f"{make_secure_url(note.url_key)}"}
+        )
 
     return render(response, "note/create_note.html")
 
@@ -57,25 +77,44 @@ def show_note(response, url_key):
                 period=PERIOD,
             ).check()
         except RateLimitExceeded as e:
-            return render(response, "note/content.html",{"response":f"{err_block_request}"},status=429)
+            return render(
+                response,
+                "note/content.html",
+                {"response": f"{err_block_request}"},
+                status=429,
+            )
 
         note = Note.objects.get(url_key=url_key)
 
         if is_expiry_date(note.start_date):
-            return render(response, "note/content.html",{"response":f"{err_block_request}"},status=410)
+            return render(
+                response,
+                "note/content.html",
+                {"response": f"{err_block_request}"},
+                status=410,
+            )
 
         decrypted_content = decrypt_contnet(note.content)
 
         Note.objects.filter(url_key=url_key).delete()
-        return render(response, "note/content.html",{"response":f"{decrypted_content}"},status=200)
+        return render(
+            response,
+            "note/content.html",
+            {"response": f"{decrypted_content}"},
+            status=200,
+        )
 
     except Note.DoesNotExist:
-        return render(response, "note/content.html",{"response":f"{err_message_readed_or_404}"},status=404)
+        return render(
+            response,
+            "note/content.html",
+            {"response": f"{err_message_readed_or_404}"},
+            status=404,
+        )
 
-    
 
 def home(request):
-    return render(request,'note/home.html')
+    return render(request, "note/home.html")
 
 
 def make_secure_url(note_url):

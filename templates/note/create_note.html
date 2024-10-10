@@ -2,9 +2,10 @@
 
 {% block style%}
 <style>
-    .form{
+    .form {
         margin: 10%;
     }
+
     h2 {
         margin: 20px;
         padding: 20px;
@@ -17,14 +18,16 @@
 {% block content %}
 
 
-<form method="post" action="#" class="form">
+<form method="post" action="/note/new/">
     {% csrf_token %}
     <div class="form-group">
         <h2>write your secret note</h2>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-      </div>
+        <textarea class="form-control" name="note" id="note" rows="3"></textarea>
+    </div>
     <div class="form-group">
-        <button type="submit" , name="save" , value="save" class="btn btn-outline-primary">Save</button>
+        <a href="#">
+            <button type="submit" , name="save" , value="save" class="btn btn-outline-primary">Save</button>
+        </a>
     </div>
 </form>
 
