@@ -1,12 +1,31 @@
 {% extends 'note/base.html' %}
 
+{% block style%}
+<style>
+    .form{
+        margin: 10%;
+    }
+    h2 {
+        margin: 20px;
+        padding: 20px;
+        background-color: #24044d;
+        color: #fff;
+    }
+</style>
+{% endblock%}
 
 {% block content %}
-<h2>write your secret note</h2>
-<form method="post" action="create_note">
+
+
+<form method="post" action="#" class="form">
     {% csrf_token %}
-    <textarea name="note" id="note"></textarea>
-    <button type="submit" , name="save" , value="save">Save</button>
+    <div class="form-group">
+        <h2>write your secret note</h2>
+        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+      </div>
+    <div class="form-group">
+        <button type="submit" , name="save" , value="save" class="btn btn-outline-primary">Save</button>
+    </div>
 </form>
 
 {% endblock %}
