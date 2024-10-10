@@ -1,0 +1,12 @@
+{% extends "../note/base.html" %}
+
+{% block content %}
+<h2>Sign up</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <a href="/">
+        <button class="btn btn-outline-primary">Create Note</button>
+    </a>
+</form>
+{% endblock %}

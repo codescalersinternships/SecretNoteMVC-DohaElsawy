@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'secret_note',
     'note',
+    "accounts",
 ]
 
 MIDDLEWARE = [

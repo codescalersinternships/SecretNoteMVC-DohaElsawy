@@ -51,7 +51,7 @@
             background-color: #24044d;
         }
 
-        button {
+        .nav-bar {
             background: none;
             color: inherit;
             border: none;
@@ -74,11 +74,11 @@
         <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
             <a href="/note/new">
-                <button type="submit">Log Out</button>
+                <button type="submit" class="nav-bar">Log Out</button>
             </a>
         </form>
         {% else %}
-        <a href="/accounts">Register</a>
+        <a href="/accounts/signup">Register</a>
         <a href="/accounts/login">login</a>
         {% endif %}
     </div>
