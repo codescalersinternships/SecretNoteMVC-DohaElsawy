@@ -17,6 +17,7 @@ err_wrong_http_method = "error, the http mothed is not post"
 err_message_readed_or_404 = "the message has been readed or not exist"
 err_message_expired = "message has expired"
 err_block_request = "you reach request's limit, please wait 1 min"
+err_empty_content = "you can't send empty note"
 
 RATE_LIMIT = 5
 PERIOD = 60
@@ -26,6 +27,9 @@ def create_note(response):
 
     if response.POST.get("save"):
         content = response.POST.get("note")
+
+        if content is None :
+            return render(response, "note/content.html",{"response":f"{err_empty_content}"},status=500)
 
         encrypted_content = encrypt_content(content)
 
