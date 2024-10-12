@@ -5,9 +5,10 @@ from note.views import RATE_LIMIT
 from .models import Note
 import datetime
 from django.core.cache import cache
+from django.contrib.auth import get_user_model
 
-# Create your tests here.
 
+USER_MODEL = get_user_model()
 
 class NoteViewTests(TestCase):
     def setUp(self):
@@ -28,15 +29,25 @@ class NoteViewTests(TestCase):
             key="74789473-782b-4ae7-b091-acbae81f7bae",
         )
 
+        cls.user = USER_MODEL.objects.create_user(
+            email='doha@test.com',
+            first_name='doha',
+            last_name='elsawy',
+            username='doha',
+            password='doha'
+        )
+
         note = Note.objects.get(id=2)
         note.start_date = datetime.datetime(2020, 5, 6, 3, 4, 5, 6)
         note.save()
 
     def test_create_note_success(self):
+        self.client.force_login(self.user)
         response = self.client.post(
             "/note/new/",
             headers={"content": "test"},
         )
+        
         self.assertEqual(response.status_code, 200)
 
     def test_show_note(self):
