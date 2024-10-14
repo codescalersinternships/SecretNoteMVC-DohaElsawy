@@ -58,13 +58,13 @@ class NoteViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.content, None)
 
-    def test__failed_show_note(self):
+    def test_failed_show_note(self):
         response = self.client.get(
             f"/note/show/unkown",
         )
         self.assertEqual(response.status_code, 404)
 
-    def test__expired_show_note(self):
+    def test_expired_show_note(self):
         note = Note.objects.get(id=2)
         response = self.client.get(
             f"/note/show/{note.url_key}",
