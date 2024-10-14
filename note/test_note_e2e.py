@@ -1,13 +1,13 @@
+import time
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.common.by import By
-from django.contrib.auth import get_user_model
-from django.core.cache import cache
 
-USER_MODEL = get_user_model()
 service = Service("/snap/bin/firefox.geckodriver")
 
+
+base_url = "http://0.0.0.0:8000/"
 
 class TestHomePage(LiveServerTestCase):
 
@@ -15,18 +15,19 @@ class TestHomePage(LiveServerTestCase):
         self.browser = webdriver.Firefox(service=service)
         super(TestHomePage, self).setUp()
 
+
     def tearDown(self):
         self.browser.quit()
         super(TestHomePage, self).tearDown()
 
     def test_create_note_without_login(self):
         browser = self.browser
-        browser.get("http://127.0.0.1:8000/")
+        browser.get(base_url)
 
         create_note_button = browser.find_element(By.NAME, "home-button-create-note")
         create_note_button.click()
         
-        self.assertEqual(browser.current_url, "http://127.0.0.1:8000/note/new/")
+        self.assertEqual(browser.current_url, f"{base_url}note/new/")
         
         page_response = browser.find_element(By.CLASS_NAME, "response")
         
@@ -34,12 +35,12 @@ class TestHomePage(LiveServerTestCase):
 
     def test_home_page_with_register(self):
         browser = self.browser
-        browser.get("http://127.0.0.1:8000/")
+        browser.get(base_url)
 
         register_button = browser.find_element(By.NAME, "register")
 
         register_button.click()
-        self.assertEqual(browser.current_url, "http://127.0.0.1:8000/accounts/signup/")
+        self.assertEqual(browser.current_url, f"{base_url}accounts/signup/")
 
         username_input = browser.find_element(By.NAME, "username")
         username_input.send_keys("ehgks")
@@ -59,18 +60,18 @@ class TestHomePage(LiveServerTestCase):
 
     def test_from_home_page_with_login_and_create_note(self):
         browser = self.browser
-        browser.get("http://127.0.0.1:8000/")
+        browser.get(base_url)
 
         register_button = browser.find_element(By.NAME, "login")
         register_button.click()
 
-        self.assertEqual(browser.current_url, "http://127.0.0.1:8000/accounts/login/")
+        self.assertEqual(browser.current_url, f"{base_url}accounts/login/")
 
         username_input = browser.find_element(By.NAME, "username")
-        username_input.send_keys("doha")
+        username_input.send_keys("hello")
 
         password_input = browser.find_element(By.NAME, "password")
-        password_input.send_keys("doha")
+        password_input.send_keys("dohadoha")
 
         login_button = browser.find_element(By.ID, "login")
         login_button.click()
@@ -100,18 +101,18 @@ class TestHomePage(LiveServerTestCase):
 
     def test_logout_and_create_note_after(self):
         browser = self.browser
-        browser.get("http://127.0.0.1:8000/")
+        browser.get(base_url)
 
         register_button = browser.find_element(By.NAME, "login")
         register_button.click()
 
-        self.assertEqual(browser.current_url, "http://127.0.0.1:8000/accounts/login/")
+        self.assertEqual(browser.current_url,f"{base_url}accounts/login/")
 
         username_input = browser.find_element(By.NAME, "username")
-        username_input.send_keys("doha")
+        username_input.send_keys("hello")
 
         password_input = browser.find_element(By.NAME, "password")
-        password_input.send_keys("doha")
+        password_input.send_keys("dohadoha")
 
         login_button = browser.find_element(By.ID, "login")
         login_button.click()
@@ -119,7 +120,7 @@ class TestHomePage(LiveServerTestCase):
         logout_button = browser.find_element(By.NAME, "logout")
         logout_button.click()
 
-        self.assertEqual(browser.current_url, "http://127.0.0.1:8000/")
+        self.assertEqual(browser.current_url, base_url)
         
         create_note_button = browser.find_element(By.NAME, "home-button-create-note")
         create_note_button.click()

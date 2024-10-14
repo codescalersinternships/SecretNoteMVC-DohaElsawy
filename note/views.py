@@ -12,7 +12,7 @@ import cryptocode
 # Create your views here.
 
 
-show_url = "http://127.0.0.1:8000/note/show/"
+show_url = "http://0.0.0.0:8000/note/show/"
 err_wrong_http_method = "error, the http mothed is not post"
 err_message_readed_or_404 = "the message has been readed or not exist"
 err_message_expired = "message has expired"
@@ -69,10 +69,14 @@ def create_note(response):
 
 def show_note(response, url_key):
     try:
-
         try:
+            ip_address = response.META.get('HTTP_X_FORWARDED_FOR')
+            if ip_address:
+                ip_address = ip_address.split(',')[0]
+            else:
+                ip_address = response.META.get('REMOTE_ADDR')
             RateLimit(
-                key=f"{'127.0.0.1'}:panel:{'127.0.0.1'}",
+                key=f"{ip_address}:panel:{ip_address}",
                 limit=RATE_LIMIT,
                 period=PERIOD,
             ).check()
