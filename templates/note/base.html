@@ -68,18 +68,18 @@
 
 <body>
     <div class="topnav">
-        <a href="/note">Home</a>
-        <a href="/note/new">Create Note</a>
+        <a href="/note" name="home">Home</a>
+        <a href="/note/new" name="create-note">Create Note</a>
         {% if user.is_authenticated %}
         <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
             <a href="/note/new">
-                <button type="submit" class="nav-bar">Log Out</button>
+                <button type="submit" class="nav-bar" name="logout">Log Out</button>
             </a>
         </form>
         {% else %}
-        <a href="/accounts/signup">Register</a>
-        <a href="/accounts/login">login</a>
+        <a href="/accounts/signup" name="register">Register</a>
+        <a href="/accounts/login" name="login">login</a>
         {% endif %}
     </div>
 
