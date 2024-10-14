@@ -1,11 +1,8 @@
 import os
 from django.shortcuts import render
 from django.utils import timezone
-from django.http import HttpResponse
 from django.utils.crypto import get_random_string
-
 from note.ratelimit import RateLimit, RateLimitExceeded
-
 from .models import Note
 import cryptocode
 
@@ -69,14 +66,10 @@ def create_note(response):
 
 def show_note(response, url_key):
     try:
+
         try:
-            ip_address = response.META.get('HTTP_X_FORWARDED_FOR')
-            if ip_address:
-                ip_address = ip_address.split(',')[0]
-            else:
-                ip_address = response.META.get('REMOTE_ADDR')
             RateLimit(
-                key=f"{ip_address}:panel:{ip_address}",
+                key="0.0.0.0:panel:0.0.0.0",
                 limit=RATE_LIMIT,
                 period=PERIOD,
             ).check()
@@ -87,7 +80,6 @@ def show_note(response, url_key):
                 {"response": f"{err_block_request}"},
                 status=429,
             )
-
         note = Note.objects.get(url_key=url_key)
 
         if is_expiry_date(note.start_date):
