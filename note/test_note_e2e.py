@@ -24,10 +24,12 @@ class TestHomePage(LiveServerTestCase):
         browser.get("http://127.0.0.1:8000/")
 
         create_note_button = browser.find_element(By.NAME, "home-button-create-note")
-
         create_note_button.click()
+        
         self.assertEqual(browser.current_url, "http://127.0.0.1:8000/note/new/")
+        
         page_response = browser.find_element(By.CLASS_NAME, "response")
+        
         self.assertEqual(page_response.text, "you have to login first")
 
     def test_home_page_with_register(self):
@@ -94,3 +96,38 @@ class TestHomePage(LiveServerTestCase):
 
         self.assertEqual(response_message_return.text, "message")
         self.assertEqual(browser.current_url, url_text)
+
+
+    def test_logout_and_create_note_after(self):
+        browser = self.browser
+        browser.get("http://127.0.0.1:8000/")
+
+        register_button = browser.find_element(By.NAME, "login")
+        register_button.click()
+
+        self.assertEqual(browser.current_url, "http://127.0.0.1:8000/accounts/login/")
+
+        username_input = browser.find_element(By.NAME, "username")
+        username_input.send_keys("doha")
+
+        password_input = browser.find_element(By.NAME, "password")
+        password_input.send_keys("doha")
+
+        login_button = browser.find_element(By.ID, "login")
+        login_button.click()
+
+        logout_button = browser.find_element(By.NAME, "logout")
+        logout_button.click()
+
+        self.assertEqual(browser.current_url, "http://127.0.0.1:8000/")
+        
+        create_note_button = browser.find_element(By.NAME, "home-button-create-note")
+        create_note_button.click()
+        
+        page_response = browser.find_element(By.CLASS_NAME, "response")
+        
+        self.assertEqual(page_response.text, "you have to login first")
+
+
+
+
