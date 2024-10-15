@@ -8,8 +8,8 @@ import cryptocode
 
 # Create your views here.
 
-
-show_url = "http://0.0.0.0:8000/note/show/"
+IP=os.environ.get("IP")
+show_url = f"http://{IP}:8000/note/show/"
 err_wrong_http_method = "error, the http mothed is not post"
 err_message_readed_or_404 = "the message has been readed or not exist"
 err_message_expired = "message has expired"
@@ -69,7 +69,7 @@ def show_note(response, url_key):
 
         try:
             RateLimit(
-                key="0.0.0.0:panel:0.0.0.0",
+                key=f"{IP}:panel:{IP}",
                 limit=RATE_LIMIT,
                 period=PERIOD,
             ).check()

@@ -1,4 +1,4 @@
-import time
+import os
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
@@ -6,8 +6,8 @@ from selenium.webdriver.common.by import By
 
 service = Service("/snap/bin/firefox.geckodriver")
 
-
-base_url = "http://0.0.0.0:8000/"
+IP=os.environ.get("IP")
+base_url = f"http://{IP}:8000/"
 
 class TestHomePage(LiveServerTestCase):
 
