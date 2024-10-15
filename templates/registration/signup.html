@@ -1,0 +1,30 @@
+{% extends "../note/base.html" %}
+
+
+{% block style%}
+<style>
+  form {
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+  }
+
+  label {
+    margin-bottom: 20px;
+  }
+  button{
+    margin: 20px;
+  }
+</style>
+{%endblock%}
+
+{% block content %}
+<h2>Sign up</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <a href="/">
+        <button class="btn btn-outline-primary" name="signin">Signin</button>
+    </a>
+</form>
+{% endblock %}
