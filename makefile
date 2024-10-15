@@ -8,5 +8,4 @@ makemigrations:
 	python manage.py makemigrations
 migrate:
 	python manage.py migrate
-run:
-	python manage.py runserver
+all-migration: makemigrations migrate run

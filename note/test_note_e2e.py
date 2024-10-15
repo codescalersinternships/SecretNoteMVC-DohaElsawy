@@ -7,7 +7,9 @@ from selenium.webdriver.common.by import By
 service = Service("/snap/bin/firefox.geckodriver")
 
 IP=os.environ.get("IP")
-base_url = f"http://{IP}:8000/"
+PORT=os.environ.get("PORT")
+
+base_url = f"http://{IP}:{PORT}/"
 
 class TestHomePage(LiveServerTestCase):
 

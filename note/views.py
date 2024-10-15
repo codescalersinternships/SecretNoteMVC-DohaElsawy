@@ -9,7 +9,11 @@ import cryptocode
 # Create your views here.
 
 IP=os.environ.get("IP")
-show_url = f"http://{IP}:8000/note/show/"
+PORT=os.environ.get("PORT")
+RATE_LIMIT = 5
+PERIOD = 60
+
+show_url = f"http://{IP}:{PORT}/note/show/"
 err_wrong_http_method = "error, the http mothed is not post"
 err_message_readed_or_404 = "the message has been readed or not exist"
 err_message_expired = "message has expired"
@@ -17,8 +21,7 @@ err_block_request = "you reach request's limit, please wait 1 min"
 err_empty_content = "you can't send empty note"
 err_login_first = "you have to login first"
 
-RATE_LIMIT = 5
-PERIOD = 60
+
 
 
 def create_note(response):

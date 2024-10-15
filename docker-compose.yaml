@@ -17,8 +17,8 @@ services:
           sh -c " 
           python manage.py makemigrations 
           && python manage.py migrate 
-          && python manage.py runserver ${IP}:8000"
+          && python manage.py runserver ${IP}:${PORT}"
     ports:
-      - "8000:8000"
+      - "${PORT}:${PORT}"
     depends_on:
       - memcached
